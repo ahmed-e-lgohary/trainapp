@@ -150,96 +150,13 @@ router.post('/diversifyTrips', async (req, res) => {
   }
 })
 
-/**
- * @openapi
- * /api/v1/users/trips/search:
- *   get:
- *     summary: Search for train trips
- *     tags: [Users / Bookings]
- *     parameters:
- *       - in: query
- *         name: from
- *         schema:
- *           type: string
- *         required: true
- *         description: Starting station ID or name
- *       - in: query
- *         name: to
- *         schema:
- *           type: string
- *         required: true
- *         description: Destination station ID or name
- *       - in: query
- *         name: date
- *         schema:
- *           type: string
- *         required: true
- *         description: Departure date (YYYY-MM-DD)
- *     responses:
- *       200:
- *         description: List of matching trips.
- */
 router.get('/trips/search', ServicesController.searchTrips)
 
 router.get('/trips/:tripId/route', ServicesController.getTripStops)
 router.get('/stations', ServicesController.getAllStations)
 router.get('/destinations', ServicesController.getValidDestinations)
 router.get('/trips/seats', ServicesController.getSeatsByTrip)
-
-/**
- * @openapi
- * /api/v1/users/trips/{tripId}/seats:
- *   get:
- *     summary: Get seats layout and availability for a trip
- *     tags: [Users / Bookings]
- *     parameters:
- *       - in: path
- *         name: tripId
- *         required: true
- *         schema:
- *           type: string
- *         description: Unique ID of the trip
- *     responses:
- *       200:
- *         description: List of seats for the trip.
- */
 router.get('/trips/:tripId/seats', ServicesController.getSeatsByTrip)
-
-/**
- * @openapi
- * /api/v1/users/seats/{seatId}/hold:
- *   post:
- *     summary: Hold a seat and start booking process
- *     tags: [Users / Bookings]
- *     parameters:
- *       - in: path
- *         name: seatId
- *         required: true
- *         schema:
- *           type: string
- *         description: Unique ID of the seat
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - passengers
- *             properties:
- *               passengers:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                     nationalId:
- *                       type: string
- *     responses:
- *       200:
- *         description: Seat held successfully.
- */
 // ✅ بدون next
 router.post('/seats/:seatId/hold', ServicesController.bookOrHoldSeatWithPayment)
 
