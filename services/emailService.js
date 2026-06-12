@@ -1,20 +1,26 @@
-const { Resend } = require('resend');
-const fs = require('fs');
-const path = require('path');
+const nodemailer = require('nodemailer')
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
+// 🔐 transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS, // ⚠️ App Password
+  },
+})
 
 // ✅ base sender
 const baseMailOptions = {
-  // Use a verified domain or onboarding@resend.dev for testing
-  from: process.env.RESEND_FROM_EMAIL || 'Train Booking <onboarding@resend.dev>',
-};
+  from: `"Train Booking" <${process.env.EMAIL_USER}>`,
+}
 
 // ----------------------
 // GENERIC EMAIL
 // ----------------------
 const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
-  const isMock = !process.env.RESEND_API_KEY || process.env.RESEND_API_KEY.includes('YOUR');
+  const isMock = !process.env.EMAIL_USER || 
+                 process.env.EMAIL_USER.includes('local') || 
+                 !process.env.EMAIL_USER.includes('@');
   
   if (isMock) {
     console.log('\n--- 📝 [MOCK EMAIL] ---');
@@ -25,55 +31,36 @@ const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
       console.log('HTML (preview):', html.substring(0, 300) + (html.length > 300 ? '...' : ''));
     }
     console.log('-----------------------\n');
-    console.log('⚠️ Set RESEND_API_KEY to send real emails.');
-    return { id: 'mock-id' };
+    return { messageId: 'mock-id', response: '250 Mock OK' };
   }
 
   try {
-    // Prepare attachments for Resend
-    const resendAttachments = attachments.map(att => {
-      if (att.path) {
-        return {
-          filename: att.filename,
-          content: fs.readFileSync(path.resolve(process.cwd(), att.path)),
-        };
-      } else if (att.content && att.encoding === 'base64') {
-        return {
-          filename: att.filename,
-          content: Buffer.from(att.content, 'base64'),
-        };
-      }
-      return { filename: att.filename, content: att.content };
-    });
-
-    const { data, error } = await resend.emails.send({
-      from: baseMailOptions.from,
-      to: [to],
+    const info = await transporter.sendMail({
+      ...baseMailOptions,
+      to,
       subject,
-      text: text || '',
-      html: html || text,
-      attachments: resendAttachments.length > 0 ? resendAttachments : undefined,
-    });
+      text,
+      html,
+      attachments,
+    })
 
-    if (error) {
-      console.error('❌ Resend API error:', error);
-      throw new Error(error.message);
-    }
+    console.log('📨 Sending email to:', to)
+    console.log('✅ Email sent:', info.response)
 
-    console.log('📨 Sending email to:', to);
-    console.log('✅ Email sent:', data.id);
-
-    return data;
+    return info
   } catch (err) {
-    console.error('❌ Email error:', err.message);
+    console.error('❌ Email error:', err.message)
     console.log('\n--- 📝 [FALLBACK MOCK EMAIL] ---');
     console.log('To:', to);
     console.log('Subject:', subject);
     console.log('Text:', text);
+    if (html) {
+      console.log('HTML (preview):', html.substring(0, 300) + (html.length > 300 ? '...' : ''));
+    }
     console.log('-------------------------------\n');
     
-    console.log('⚠️ Email sending failed, but continuing with mock response.');
-    return { id: 'mock-id-fallback' };
+    console.log('⚠️ Email sending failed, but continuing with mock response in development.');
+    return { messageId: 'mock-id', response: '250 Mock OK (Fallback)' };
   }
 }
 
