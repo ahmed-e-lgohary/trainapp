@@ -45,11 +45,13 @@ const swaggerSpec = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email", "password", "name"],
+                required: ["email", "password", "confirmPassword", "name", "phone"],
                 properties: {
                   email: { type: "string" },
                   password: { type: "string" },
+                  confirmPassword: { type: "string" },
                   name: { type: "string" },
+                  phone: { type: "string" },
                 },
               },
             },
@@ -68,10 +70,11 @@ const swaggerSpec = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email", "otp"],
+                required: ["email", "otp", "type"],
                 properties: {
                   email: { type: "string" },
                   otp: { type: "string" },
+                  type: { type: "string", enum: ["signup", "reset"] },
                 },
               },
             },
@@ -90,8 +93,11 @@ const swaggerSpec = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email"],
-                properties: { email: { type: "string" } },
+                required: ["email", "type"],
+                properties: { 
+                  email: { type: "string" },
+                  type: { type: "string", enum: ["signup", "reset"] },
+                },
               },
             },
           },
@@ -118,7 +124,7 @@ const swaggerSpec = {
             },
           },
         },
-        responses: { 200: { description: "Login successful. Returns token." } },
+        responses: { 200: { description: "Login successful. Returns token and user object." } },
       },
     },
     "/api/v1/email/login/google": {
@@ -212,12 +218,14 @@ const swaggerSpec = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email", "password", "name", "role"],
+                required: ["email", "password", "confirmPassword", "name", "phone", "role"],
                 properties: {
                   email: { type: "string" },
                   password: { type: "string" },
+                  confirmPassword: { type: "string" },
                   name: { type: "string" },
-                  role: { type: "string", enum: ["user", "admin", "Commissary"] },
+                  phone: { type: "string" },
+                  role: { type: "string", enum: ["user", "admin", "commissary"] },
                 },
               },
             },
@@ -244,7 +252,11 @@ const swaggerSpec = {
                 type: "object",
                 properties: {
                   name: { type: "string" },
+                  email: { type: "string" },
                   phone: { type: "string" },
+                  password: { type: "string" },
+                  NationalId: { type: "string" },
+                  country: { type: "string" },
                 },
               },
             },

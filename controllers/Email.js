@@ -325,6 +325,12 @@ exports.login = async (req, res) => {
 
     return sendRes(res, 200, true, "Login success", {
       token: generateToken(user),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     return sendRes(res, 500, false, err.message);
