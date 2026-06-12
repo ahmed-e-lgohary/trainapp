@@ -1,10 +1,17 @@
 const nodemailer = require('nodemailer')
+const dns = require('dns');
+
+// Force IPv4 globally for this service to avoid IPv6 ENETUNREACH on Railway
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // 🔐 transporter
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false, // false for 587, requireTLS handles the encryption
+  requireTLS: true,
   family: 4, // Force IPv4
   connectionTimeout: 10000, // 10 seconds timeout
   auth: {
