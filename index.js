@@ -102,8 +102,6 @@ app.use(notFound);
 // ENV CHECK
 const requiredEnv = [
   "JWT_SECRET",
-  "EMAIL_USER",
-  "EMAIL_PASS",
   "EMAIL_SECRET",
   "MONGO_URI",
 ];
