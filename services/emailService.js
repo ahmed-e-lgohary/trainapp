@@ -46,6 +46,23 @@ const sendEmail = async ({ to, subject, text, html, attachments = [] }) => {
   }
 
   try {
+    // 🔍 Detailed Logger for the user to verify credentials
+    console.log('\n--- 🔍 [EMAIL CREDENTIALS CHECK] ---');
+    console.log('EMAIL_USER:', process.env.EMAIL_USER ? `Found (${process.env.EMAIL_USER})` : 'MISSING!');
+    
+    const pass = process.env.EMAIL_PASS;
+    if (pass) {
+      console.log(`EMAIL_PASS: Found, Length: ${pass.length} chars`);
+      console.log(`EMAIL_PASS Value: ${pass.substring(0, 3)}...${pass.substring(pass.length - 3)}`);
+      console.log(`Has spaces? : ${pass.includes(' ') ? 'YES (Warning!)' : 'NO (Good)'}`);
+    } else {
+      console.log('EMAIL_PASS: MISSING!');
+    }
+    console.log('Host:', transporter.options.host);
+    console.log('Port:', transporter.options.port);
+    console.log('Family (IPv4):', transporter.options.family);
+    console.log('-------------------------------------\n');
+
     const info = await transporter.sendMail({
       ...baseMailOptions,
       to,
